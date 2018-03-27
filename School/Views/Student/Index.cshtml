@@ -1,0 +1,63 @@
+﻿@model School.Models.StudentListViewModel
+@{
+    ViewBag.Title = "Students";
+}
+
+<h2>Students</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (var i = 0; i < Model.Students.Count; i++)
+        {
+            <tr>
+                <td>@Model.Students[i].FullName</td>
+                <td>
+                    @Html.ActionLink("Detail", "StudentDetail", new { id = Model.Students[i].StudentId })
+                    | @Html.ActionLink("Edit", "StudentEdit", new { id = Model.Students[i].StudentId })
+                    | <a data-toggle="modal" href="@("#deleteStudentModal" + i)">Delete</a>
+                    <div class="modal fade" id="@("deleteStudentModal" + i)" tabindex="-1" role="dialog">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                @using (Html.BeginForm("DeleteStudent", "Student"))
+                                {
+                                    <input type="hidden" value="@Model.Students[i].StudentId" name="StudentId" />
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title">Delete @Model.Students[i].FullName</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete @Model.Students[i].FullName?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">Yes</button>
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+
+			Total Students: <div class="col-sm-12 form-group">
+    <label>Total Students:</label> @Model.TotalStudents
+</div>
+<div class="col-sm-12">
+    @Html.ActionLink("Add Student", "StudentAdd", null, new { @class = "btn btn-primary" })
+</div>
+
+
+
+
+
