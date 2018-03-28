@@ -30,38 +30,44 @@ namespace School.Controllers
 
         public ActionResult Index()
         {
-            var studentList = new StudentListViewModel
+            using (var schoolContext = new SchoolContext())
             {
-               // Convert each Student to a StudentViewModel
-                Students = Students.Select(p => new StudentViewModel
+                var studentList = new StudentListViewModel
                 {
-                    StudentId = p.StudentId,
-                    LastName = p.LastName,
-                    FirstName = p.FirstName
-                }).ToList()
-            };
+                    // Convert each Student to a StudentViewModel
+                    Students = schoolContext.Students.Select(p => new StudentViewModel
+                    {
+                        StudentId = p.StudentId,
+                        LastName = p.LastName,
+                        FirstName = p.FirstName
+                    }).ToList()
+                };
 
-            studentList.TotalStudents = studentList.Students.Count;
+                studentList.TotalStudents = studentList.Students.Count;
 
-            return View(studentList);
+                return View(studentList);
+            }
         }
         // Detail
         public ActionResult StudentDetail(int id)
         {
-            var student = Students.SingleOrDefault(p => p.StudentId == id);
-            if (student != null)
+            using (var schoolContext = new SchoolContext())
             {
-                var studentViewModel = new StudentViewModel
+                var student = schoolContext.Students.SingleOrDefault(p => p.StudentId == id);
+                if (student != null)
                 {
-                    StudentId = student.StudentId,
-                    LastName = student.LastName,
-                    FirstName = student.FirstName
-                };
+                    var studentViewModel = new StudentViewModel
+                    {
+                        StudentId = student.StudentId,
+                        LastName = student.LastName,
+                        FirstName = student.FirstName
+                    };
 
-                return View(studentViewModel);
+                    return View(studentViewModel);
+                }
+
+                return new HttpNotFoundResult();
             }
-
-            return new HttpNotFoundResult();
         }
 
         // Add action to add a student to our data.
@@ -74,68 +80,79 @@ namespace School.Controllers
         [HttpPost]
         public ActionResult AddStudent(StudentViewModel studentViewModel)
         {
-            var nextStudentId = Students.Max(p => p.StudentId) + 1;
-
-            var student = new Student
+            using (var schoolContext = new SchoolContext())
             {
-                StudentId = nextStudentId,
-                LastName = studentViewModel.LastName,
-                FirstName = studentViewModel.FirstName
-            };
+                var nextStudentId = schoolContext.Students.Max(p => p.StudentId) + 1;
 
-            Students.Add(student);
+                var student = new Student
+                {
+                    StudentId = nextStudentId,
+                    LastName = studentViewModel.LastName,
+                    FirstName = studentViewModel.FirstName
+                };
 
-            return RedirectToAction("Index");
+                schoolContext.Students.Add(student);
+
+                return RedirectToAction("Index");
+            }
         }
-
         // Here we can edit any student.
         public ActionResult StudentEdit(int id)
         {
-            var student = Students.SingleOrDefault(p => p.StudentId == id);
-            if (student != null)
+            using (var schoolContext = new SchoolContext())
             {
-                var studentViewModel = new StudentViewModel
+                var student = schoolContext.Students.SingleOrDefault(p => p.StudentId == id);
+                if (student != null)
                 {
-                    StudentId = student.StudentId,
-                    LastName = student.LastName,
-                    FirstName = student.FirstName
-                };
+                    var studentViewModel = new StudentViewModel
+                    {
+                        StudentId = student.StudentId,
+                        LastName = student.LastName,
+                        FirstName = student.FirstName
+                    };
 
-                return View("AddEditStudent", studentViewModel);
+                    return View("AddEditStudent", studentViewModel);
+                }
+
+                return new HttpNotFoundResult();
             }
-
-            return new HttpNotFoundResult();
         }
         [HttpPost]
         public ActionResult EditStudent(StudentViewModel studentViewModel)
         {
-            var student = Students.SingleOrDefault(p => p.StudentId == studentViewModel.StudentId);
-
-            if (student != null)
+            using (var schoolContext = new SchoolContext())
             {
-                student.LastName = studentViewModel.LastName;
-                student.FirstName = studentViewModel.FirstName;
+                var student = schoolContext.Students.SingleOrDefault(p => p.StudentId == studentViewModel.StudentId);
 
-                return RedirectToAction("Index");
+                if (student != null)
+                {
+                    student.LastName = studentViewModel.LastName;
+                    student.FirstName = studentViewModel.FirstName;
+
+                    return RedirectToAction("Index");
+                }
+
+                return new HttpNotFoundResult();
             }
-
-            return new HttpNotFoundResult();
         }
 
         // Delete action is used to remove any student from our data.
         [HttpPost]
         public ActionResult DeleteStudent(StudentViewModel studentViewModel)
         {
-            var student = Students.SingleOrDefault(p => p.StudentId == studentViewModel.StudentId);
-
-            if (student != null)
+            using (var schoolContext = new SchoolContext())
             {
-                Students.Remove(student);
+                var student = schoolContext.Students.SingleOrDefault(p => p.StudentId == studentViewModel.StudentId);
 
-                return RedirectToAction("Index");
+                if (student != null)
+                {
+                    schoolContext.Students.Remove(student);
+
+                    return RedirectToAction("Index");
+                }
+
+                return new HttpNotFoundResult();
             }
-
-            return new HttpNotFoundResult();
         }
 
 
