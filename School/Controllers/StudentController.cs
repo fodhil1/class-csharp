@@ -18,7 +18,7 @@ namespace School.Controllers
             {
                 var studentList = new StudentListViewModel
                 {
-                    // Convert each Student to a StudentViewModel
+                    // Convert each Student to a StudentViewModel //
                     Students = schoolContext.Students.Select(p => new StudentViewModel
                     {
                         StudentId = p.StudentId,
